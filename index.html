@@ -1,0 +1,894 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Bistro Koren - ukazkovy web restaurace: menu s cenami a alergeny, rezervace, oteviraci doba.">
+<style>
+  :root{color-scheme:light}
+  html,body{margin:0}
+  img{max-width:100%}
+  [hidden]{display:none!important}
+</style>
+<title>Bistro Kořen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..700&family=Karla:wght@300..700&display=swap">
+
+<style>
+:root{
+  --ink:#130F0B;
+  --ink-2:#1C1711;
+  --ink-3:#2A2219;
+  --cream:#F3ECDF;
+  --cream-2:#E8DDC9;
+  --dim:#A99B86;
+  --dim-dark:#6B5F4E;
+  --flame:#D2603A;
+  --flame-deep:#8A3520;
+  --moss:#7E8A55;
+  --rule:rgba(243,236,223,.15);
+  --rule-dark:rgba(19,15,11,.16);
+
+  --serif:"Fraunces","Iowan Old Style",Georgia,"Times New Roman",serif;
+  --sans:"Karla","Segoe UI",system-ui,-apple-system,sans-serif;
+
+  --wrap:1180px;
+  --gut:clamp(20px,5vw,64px);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--ink);
+  color:var(--cream);
+  font-family:var(--sans);
+  font-size:17px;
+  line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+img{max-width:100%;display:block}
+a{color:inherit}
+h1,h2,h3,h4{font-family:var(--serif);font-optical-sizing:auto;font-weight:400;text-wrap:balance;margin:0;line-height:1.08}
+p{margin:0}
+:focus-visible{outline:2px solid var(--flame);outline-offset:3px;border-radius:2px}
+
+.wrap{width:100%;max-width:var(--wrap);margin-inline:auto;padding-inline:var(--gut)}
+.eyebrow{
+  font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;
+  font-weight:600;color:var(--flame);margin-bottom:1.1rem;
+}
+.eyebrow.on-cream{color:var(--flame-deep)}
+.lede{font-size:1.18rem;line-height:1.6;max-width:56ch;color:var(--dim)}
+.lede.on-cream{color:var(--dim-dark)}
+
+/* ---------- demo bar ---------- */
+.demobar{
+  position:relative;z-index:60;
+  background:var(--flame-deep);color:#FBEFE6;
+  font-size:.8rem;line-height:1.45;
+}
+.demobar .wrap{
+  display:flex;flex-wrap:wrap;gap:.4rem 1.2rem;align-items:baseline;
+  padding-block:.6rem;
+}
+.demobar strong{letter-spacing:.14em;text-transform:uppercase;font-size:.7rem;font-weight:700}
+.demobar a{margin-left:auto;color:#FBEFE6;text-underline-offset:3px;white-space:nowrap}
+
+/* ---------- nav ---------- */
+.nav{
+  position:sticky;top:0;z-index:50;
+  background:rgba(19,15,11,.72);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid transparent;
+  transition:background .25s ease,border-color .25s ease;
+}
+.nav.solid{background:rgba(19,15,11,.96);border-bottom-color:var(--rule)}
+.nav .wrap{display:flex;align-items:center;gap:1.4rem;padding-block:.85rem}
+.brand{font-family:var(--serif);font-size:1.32rem;letter-spacing:.01em;text-decoration:none;white-space:nowrap}
+.brand em{font-style:normal;color:var(--flame)}
+.navlinks{display:flex;gap:1.6rem;margin-left:1rem}
+.navlinks a{font-size:.9rem;text-decoration:none;color:var(--dim);transition:color .18s}
+.navlinks a:hover{color:var(--cream)}
+.navmeta{margin-left:auto;display:flex;align-items:center;gap:1.2rem}
+.navaddr{font-size:.8rem;color:var(--dim);white-space:nowrap}
+.navaddr a{text-decoration:none}
+.navaddr a:hover{color:var(--cream)}
+
+.btn{
+  display:inline-block;border:0;cursor:pointer;font-family:var(--sans);
+  background:var(--flame);color:#170D08;
+  font-size:.86rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  padding:.72rem 1.35rem;text-decoration:none;border-radius:2px;
+  transition:background .18s,transform .18s;
+}
+.btn:hover{background:#E4744C;transform:translateY(-1px)}
+.btn.ghost{background:transparent;color:var(--cream);box-shadow:inset 0 0 0 1px var(--rule)}
+.btn.ghost:hover{background:rgba(243,236,223,.07)}
+.btn.big{font-size:.95rem;padding:1rem 1.9rem}
+.btn.dark{background:var(--flame-deep);color:#FBEFE6}
+.btn.dark:hover{background:#A03F26}
+
+.navtoggle{display:none;background:none;border:1px solid var(--rule);color:var(--cream);
+  border-radius:2px;padding:.45rem .7rem;font:inherit;font-size:.8rem;cursor:pointer}
+
+/* ---------- hero ---------- */
+.hero{position:relative;isolation:isolate;background:var(--ink-2)}
+.hero-img{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;object-position:50% 58%;
+  z-index:-2;
+  animation:heroIn 1.6s cubic-bezier(.2,.7,.3,1) both;
+}
+@keyframes heroIn{from{transform:scale(1.06)}to{transform:scale(1)}}
+.hero::after{
+  content:"";position:absolute;inset:0;z-index:-1;
+  background:
+    linear-gradient(to top,rgba(19,15,11,.94) 0%,rgba(19,15,11,.62) 38%,rgba(19,15,11,.12) 70%,rgba(19,15,11,.42) 100%);
+}
+.hero .wrap{
+  min-height:min(74vh,660px);
+  display:flex;flex-direction:column;justify-content:flex-end;
+  padding-block:clamp(3rem,9vw,5.5rem);
+}
+.hero h1{
+  font-size:clamp(3rem,9.5vw,6.4rem);
+  font-weight:300;letter-spacing:-.015em;margin-bottom:1rem;
+}
+.hero h1 em{font-style:normal;color:var(--flame)}
+.hero-id{font-size:clamp(1.05rem,2.2vw,1.35rem);max-width:34ch;color:#E8DFD0;line-height:1.45}
+.hero-meta{
+  display:flex;flex-wrap:wrap;align-items:center;gap:.9rem 1.6rem;
+  margin-top:2.2rem;
+}
+.status{display:flex;align-items:center;gap:.55rem;font-size:.92rem;color:#E8DFD0}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--moss);box-shadow:0 0 0 4px rgba(126,138,85,.22)}
+.dot.shut{background:#8E6A55;box-shadow:0 0 0 4px rgba(142,106,85,.2)}
+.rating{font-size:.92rem;color:var(--dim);display:flex;align-items:center;gap:.45rem}
+.rating b{color:#E8DFD0;font-weight:600;font-variant-numeric:tabular-nums}
+.stars{color:var(--flame);letter-spacing:.08em}
+
+/* ---------- sections ---------- */
+.sec{padding-block:clamp(4.5rem,10vw,7.5rem)}
+.sec.cream{background:var(--cream);color:var(--ink)}
+.sec.cream .lede{color:var(--dim-dark)}
+.sec-head{margin-bottom:clamp(2.5rem,5vw,3.8rem)}
+.sec-head h2{font-size:clamp(2.1rem,5.2vw,3.4rem);font-weight:300;margin-bottom:1.1rem}
+
+/* ---------- menu ---------- */
+.menu-note{
+  font-size:.86rem;color:var(--dim-dark);border-left:2px solid var(--flame-deep);
+  padding-left:.9rem;max-width:52ch;margin-top:1.6rem;
+}
+.courses{display:grid;grid-template-columns:1fr 1fr;gap:clamp(2.5rem,5vw,4.5rem)}
+.course{break-inside:avoid}
+.course + .course{margin-top:clamp(2.5rem,4vw,3.4rem)}
+.course h3{
+  font-family:var(--sans);font-size:.74rem;font-weight:700;
+  letter-spacing:.22em;text-transform:uppercase;color:var(--flame-deep);
+  padding-bottom:.7rem;border-bottom:1px solid var(--rule-dark);margin-bottom:1.6rem;
+}
+.item{padding-block:1.05rem}
+.item + .item{border-top:1px solid rgba(19,15,11,.08)}
+.item-top{display:flex;align-items:baseline;gap:.6rem}
+.item-name{font-family:var(--serif);font-size:1.12rem;line-height:1.3}
+.leader{flex:1 1 auto;border-bottom:1px dotted rgba(19,15,11,.3);transform:translateY(-.24em);min-width:1.5rem}
+.item-price{font-variant-numeric:tabular-nums;font-weight:600;font-size:.98rem;white-space:nowrap}
+.item-desc{font-size:.92rem;line-height:1.55;color:var(--dim-dark);max-width:46ch;margin-top:.4rem}
+.allerg{font-size:.78rem;color:#9C8F7C;margin-top:.35rem;font-variant-numeric:tabular-nums}
+.sig{
+  display:inline-block;vertical-align:middle;
+  font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;font-weight:700;
+  color:#3E4626;background:rgba(126,138,85,.22);
+  padding:.2rem .5rem;border-radius:2px;margin-left:.15rem;white-space:nowrap;
+}
+
+.lunch{
+  margin-top:clamp(3rem,6vw,4.5rem);
+  background:var(--cream-2);
+  padding:clamp(1.6rem,4vw,2.4rem);
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:clamp(1.2rem,3vw,2.5rem);
+  align-items:start;
+}
+.lunch h3{font-size:1.7rem;font-weight:300;margin-bottom:.5rem}
+.lunch .tag{font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--flame-deep);font-weight:700}
+.lunch p{font-size:.95rem;color:var(--dim-dark)}
+.lunch dl{margin:0;display:grid;grid-template-columns:auto 1fr auto;gap:.5rem .9rem;font-size:.95rem}
+.lunch dt{font-weight:600}
+.lunch dd{margin:0;color:var(--dim-dark)}
+.lunch .pr{font-variant-numeric:tabular-nums;font-weight:600;color:var(--ink);text-align:right}
+
+/* ---------- chef ---------- */
+.chef{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:clamp(2rem,6vw,5rem);align-items:center}
+.chef img{width:100%;height:100%;object-fit:cover;aspect-ratio:4/5;filter:saturate(.85)}
+.chef-body h2{font-size:clamp(1.9rem,4.5vw,2.9rem);font-weight:300;margin-bottom:1.6rem}
+.chef-body p{font-size:1.06rem;line-height:1.7;color:#DACFBE;max-width:52ch}
+.chef-body p + p{margin-top:1.2rem}
+.sign{
+  margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--rule);
+  font-size:.88rem;color:var(--dim);
+}
+.sign b{display:block;font-family:var(--serif);font-size:1.15rem;color:var(--cream);font-weight:400;margin-bottom:.15rem}
+.provenance{margin-top:1.6rem;display:flex;flex-wrap:wrap;gap:.5rem}
+.provenance span{font-size:.78rem;color:var(--dim);border:1px solid var(--rule);padding:.3rem .7rem;border-radius:2px}
+
+/* ---------- room / quote ---------- */
+.room{background:var(--ink-2)}
+.room-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:clamp(2rem,5vw,4rem);align-items:center}
+.room img{aspect-ratio:3/2;object-fit:cover;width:100%}
+.quote{font-family:var(--serif);font-size:clamp(1.5rem,3.4vw,2.15rem);line-height:1.3;font-weight:300}
+.quote-src{margin-top:1.3rem;font-size:.82rem;color:var(--dim)}
+.demo-tag{
+  display:inline-block;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;
+  font-weight:700;color:#E5B79F;background:rgba(210,96,58,.16);
+  padding:.2rem .5rem;border-radius:2px;
+}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(2rem,6vw,4.5rem)}
+.visit img{aspect-ratio:4/5;object-fit:cover;width:100%}
+.hours{margin:0 0 2.2rem;display:grid;grid-template-columns:3.2rem 1fr;gap:.45rem 1rem;font-size:.98rem}
+.hours dt{color:var(--dim);font-weight:400}
+.hours dd{margin:0;font-variant-numeric:tabular-nums}
+.hours .today dt,.hours .today dd{color:var(--flame);font-weight:600}
+.info-block + .info-block{margin-top:1.9rem}
+.info-block h4{font-family:var(--sans);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;font-weight:700;color:var(--dim);margin-bottom:.6rem}
+.info-block p{font-size:.95rem;color:#DACFBE;max-width:46ch}
+.phone-line{font-family:var(--serif);font-size:1.5rem;text-decoration:none;display:inline-block;margin-top:.3rem}
+.phone-line:hover{color:var(--flame)}
+
+/* ---------- reservation ---------- */
+.resv{background:var(--cream);color:var(--ink)}
+.resv-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:clamp(2.2rem,6vw,4.5rem);align-items:start}
+form{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem}
+.field{display:flex;flex-direction:column;gap:.4rem}
+.field.full{grid-column:1/-1}
+label{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--dim-dark)}
+input,select,textarea{
+  font-family:var(--sans);font-size:1rem;color:var(--ink);
+  background:transparent;border:0;border-bottom:1px solid rgba(19,15,11,.28);
+  padding:.55rem .1rem;border-radius:0;
+  transition:border-color .18s;
+}
+input:focus,select:focus,textarea:focus{outline:none;border-bottom-color:var(--flame-deep)}
+input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--flame-deep);outline-offset:3px}
+textarea{resize:vertical;min-height:3.4rem;line-height:1.5}
+select{appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--dim-dark) 50%),linear-gradient(135deg,var(--dim-dark) 50%,transparent 50%);background-position:calc(100% - 12px) 1.05rem,calc(100% - 7px) 1.05rem;background-size:5px 5px;background-repeat:no-repeat;padding-right:1.6rem}
+.err{grid-column:1/-1;font-size:.85rem;color:#A03F26;min-height:1.2em}
+.form-actions{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:1rem}
+.form-actions small{font-size:.8rem;color:var(--dim-dark)}
+.resv-ok{
+  grid-column:1/-1;background:rgba(126,138,85,.16);border-left:2px solid var(--moss);
+  padding:1rem 1.1rem;font-size:.92rem;line-height:1.55;
+}
+.resv-ok b{display:block;margin-bottom:.25rem}
+.policies{background:var(--cream-2);padding:clamp(1.4rem,3.5vw,2rem)}
+.policies h3{font-family:var(--sans);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;font-weight:700;color:var(--flame-deep);margin-bottom:1.2rem}
+.policies ul{margin:0;padding:0;list-style:none;display:grid;gap:.95rem}
+.policies li{font-size:.93rem;line-height:1.55;color:#4A4034;padding-left:1.1rem;position:relative}
+.policies li::before{content:"";position:absolute;left:0;top:.62em;width:5px;height:1px;background:var(--flame-deep)}
+.policies .call{margin-top:1.4rem;padding-top:1.4rem;border-top:1px solid var(--rule-dark);font-size:.93rem}
+.policies .call a{font-weight:700;color:var(--flame-deep);text-underline-offset:3px}
+
+/* ---------- pitch ---------- */
+.pitch{background:var(--ink-2);border-top:3px solid var(--flame)}
+.pitch-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(2.2rem,6vw,4.5rem);align-items:start}
+.pitch h2{font-size:clamp(2rem,4.8vw,3.1rem);font-weight:300;margin-bottom:1.3rem}
+.deliver{margin:0;padding:0;list-style:none;display:grid;gap:1.15rem}
+.deliver li{display:grid;grid-template-columns:1.4rem 1fr;gap:.8rem;font-size:.98rem;line-height:1.55;color:#DACFBE}
+.deliver .mark{color:var(--flame);font-family:var(--serif);font-size:1.05rem;line-height:1.5}
+.contact{margin-top:2.4rem;padding:1.5rem;background:rgba(243,236,223,.05);border:1px solid var(--rule)}
+.contact .fillnote{font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--flame);margin-bottom:.9rem}
+.contact dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:.55rem 1.2rem;font-size:.98rem;align-items:baseline}
+.contact dt{font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.contact dd{margin:0}
+.fill{border-bottom:1px dashed var(--flame);padding-bottom:1px;color:#E8DFD0}
+
+/* ---------- footer ---------- */
+footer{background:var(--ink);border-top:1px solid var(--rule);padding-block:2.6rem 3.4rem}
+.foot{display:flex;flex-wrap:wrap;gap:1.2rem 2.5rem;align-items:baseline;font-size:.85rem;color:var(--dim)}
+.foot .brand{font-size:1.1rem;color:var(--cream)}
+.foot a{text-decoration:none}
+.foot a:hover{color:var(--cream)}
+.foot .end{margin-left:auto;font-size:.78rem}
+
+/* ---------- mobile sticky bar ---------- */
+.mobar{display:none}
+
+@media (max-width:900px){
+  .courses{grid-template-columns:1fr;gap:0}
+  .courses .col + .col .course:first-child{margin-top:clamp(2.5rem,4vw,3.4rem)}
+  .lunch,.chef,.room-grid,.visit-grid,.resv-grid,.pitch-grid{grid-template-columns:1fr}
+  .chef img,.visit img{aspect-ratio:3/2;max-height:420px}
+  .chef-body{order:-1}
+  .navlinks{
+    display:none;position:absolute;top:100%;left:0;right:0;
+    flex-direction:column;gap:0;margin:0;
+    background:rgba(19,15,11,.98);border-bottom:1px solid var(--rule);
+  }
+  .navlinks.open{display:flex}
+  .navlinks a{padding:.95rem var(--gut);border-top:1px solid var(--rule)}
+  .nav .wrap{position:relative}
+  .navtoggle{display:block;margin-left:auto}
+  .navmeta{margin-left:0;gap:.7rem}
+  .navaddr{display:none}
+  .navmeta .btn{display:none}
+}
+@media (max-width:640px){
+  body{font-size:16px}
+  form{grid-template-columns:1fr}
+  .field.half{grid-column:auto}
+  .mobar{
+    display:flex;position:fixed;left:0;right:0;bottom:0;z-index:55;
+    background:rgba(19,15,11,.97);border-top:1px solid var(--rule);
+    padding:.65rem var(--gut) calc(.65rem + env(safe-area-inset-bottom));gap:.7rem;
+  }
+  .mobar a{flex:1;text-align:center;padding:.8rem .6rem;font-size:.82rem}
+  footer{padding-bottom:6rem}
+  .demobar a{margin-left:0}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
+html{scroll-behavior:smooth;scroll-padding-top:5rem}
+</style>
+</head>
+<body>
+
+
+<div class="demobar">
+  <div class="wrap">
+    <strong>Ukázkový web</strong>
+    <span>Bistro Kořen neexistuje. Texty, fotky, ceny, hodnocení i telefon jsou smyšlené — jde o ukázku toho, jak může vypadat web restaurace.</span>
+    <a href="#nabidka">Chci takový web pro svůj podnik →</a>
+  </div>
+</div>
+
+<nav class="nav" id="nav">
+  <div class="wrap">
+    <a class="brand" href="#top">Bistro <em>Kořen</em></a>
+    <div class="navlinks" id="navlinks">
+      <a href="#menu">Menu</a>
+      <a href="#kuchyne">Kuchyně</a>
+      <a href="#navsteva">Návštěva</a>
+    </div>
+    <div class="navmeta">
+      <span class="navaddr">Kořenná 8, Praha 2 &nbsp;·&nbsp; <a href="tel:+420212345678">212&nbsp;345&nbsp;678</a></span>
+      <a class="btn" href="#rezervace">Rezervovat stůl</a>
+      <button class="navtoggle" id="navtoggle" aria-expanded="false" aria-controls="navlinks">Nabídka</button>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <img class="hero-img" src="img/hero.jpg" alt="Grilovaný hovězí steak s demi-glace, pečenými bramborami a chřestem" width="1800" height="2250">
+  <div class="wrap">
+    <h1>Bistro <em>Kořen</em></h1>
+    <p class="hero-id">Vinohradské bistro, kde se vaří z toho, co doveze dodavatel do sta kilometrů. Otevřená kuchyně, šest míst u baru bez rezervace.</p>
+    <div class="hero-meta">
+      <a class="btn big" href="#rezervace">Rezervovat stůl</a>
+      <span class="status"><span class="dot" id="statusDot"></span><span id="statusText">Út–Čt 11:00–22:00</span></span>
+      <span class="rating"><span class="stars" aria-hidden="true">★★★★★</span> <b>4,8</b> · 312 hodnocení na Google</span>
+    </div>
+  </div>
+</header>
+
+<section class="sec cream" id="menu">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow on-cream">Menu</p>
+      <h2>Co dneska vaříme</h2>
+      <p class="lede on-cream">Karta se mění čtyřikrát do roka a průběžně podle toho, co je zrovna dobré. Když něco dojde, škrtneme to.</p>
+      <p class="menu-note">Ceny jsou v korunách včetně DPH. Čísla v závorce jsou alergeny podle přílohy nařízení EU&nbsp;1169/2011. Značka <span class="sig">Doporučujeme</span> je to, co objednává kuchyně sama pro sebe.</p>
+    </div>
+
+    <div class="courses">
+      <div class="col">
+        <div class="course">
+          <h3>Na začátek</h3>
+
+          <div class="item">
+            <div class="item-top">
+              <span class="item-name">Domácí chléb, kvašené máslo, sůl</span>
+              <span class="leader"></span>
+              <span class="item-price">75</span>
+            </div>
+            <p class="item-desc">Kvas ze žitné mouky, těsto kyne 24 hodin ve sklepě. Máslo stloukáme sami a necháváme ho tři dny zkysat.</p>
+            <p class="allerg">Alergeny: 1, 7</p>
+          </div>
+
+          <div class="item">
+            <div class="item-top">
+              <span class="item-name">Hovězí tatarák, žloutek, topinky <span class="sig">Doporučujeme</span></span>
+              <span class="leader"></span>
+              <span class="item-price">285</span>
+            </div>
+            <p class="item-desc">Svíčková z býka z Vysočiny, sekaná nožem vždycky až ráno. Topinky z našeho chleba, česnek k nim dáváme zvlášť.</p>
+            <p class="allerg">Alergeny: 1, 3, 10</p>
+          </div>
+
+          <div class="item">
+            <div class="item-top">
+              <span class="item-name">Uzený pstruh, křen, kyselá smetana</span>
+              <span class="leader"></span>
+              <span class="item-price">195</span>
+            </div>
+            <p class="item-desc">Pstruh z Pošumaví, dvanáct hodin v nálevu, pak studený kouř z olšového dřeva. Křen strouháme až na talíř.</p>
+            <p class="allerg">Alergeny: 4, 7</p>
+          </div>
+
+          <div class="item">
+            <div class="item-top">
+              <span class="item-name">Pečená řepa, kozí sýr, vlašské ořechy</span>
+              <span class="leader"></span>
+              <span class="item-price">165</span>
+            </div>
+            <p class="item-desc">Řepa se peče v soli tři hodiny a loupe se teplá. Sýr vozíme z farmy u Vsetína, ořechy pražíme na sucho.</p>
+            <p class="allerg">Alergeny: 7, 8</p>
+          </div>
+        </div>
+
+        <div class="course">
+          <h3>Přílohy</h3>
+          <div class="item">
+            <div class="item-top"><span class="item-name">Pečené brambory s rozmarýnem</span><span class="leader"></span><span class="item-price">65</span></div>
+          </div>
+          <div class="item">
+            <div class="item-top"><span class="item-name">Hranolky, aioli</span><span class="leader"></span><span class="item-price">75</span></div>
+            <p class="allerg">Alergeny: 3, 10</p>
+          </div>
+          <div class="item">
+            <div class="item-top"><span class="item-name">Sezonní zelenina z pánve</span><span class="leader"></span><span class="item-price">85</span></div>
+            <p class="allerg">Alergeny: 7</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="course">
+          <h3>Hlavní chody</h3>
+
+          <div class="item">
+            <div class="item-top">
+              <span class="item-name">Hovězí líčka na frankovce, celerové pyré <span class="sig">Doporučujeme</span></span>
+              <span class="leader"></span>
+              <span class="item-price">395</span>
+            </div>
+            <p class="item-desc">Osm hodin v troubě s frankovkou z Velkých Bílovic. Celer pečeme celý v popelu, pak ho mixujeme s máslem a citronem.</p>
+            <p class="allerg">Alergeny: 7, 9, 12</p>
+          </div>
+
+          <div class="item">
+            <div class="item-top">
+              <span class="item-name">Konfitovaná kachní stehna, červené zelí, knedlík</span>
+              <span class="leader"></span>
+              <span class="item-price">345</span>
+            </div>
+            <p class="item-desc">Kachny od Vojty z Řepína, pět hodin ve vlastním sádle při 82 °C. Zelí táhne s jablkem a kmínem od šesti ráno.</p>
+            <p class="allerg">Alergeny: 1, 3</p>
+          </div>
+
+          <div class="item">
+            <div class="item-top">
+              <span class="item-name">Pečený candát, máslová omáčka, špenát</span>
+              <span class="leader"></span>
+              <span class="item-price">365</span>
+            </div>
+            <p class="item-desc">Candát z Novomlýnských nádrží. Kůže na rozpálené pánvi, maso pak dvě minuty v troubě a dost.</p>
+            <p class="allerg">Alergeny: 4, 7</p>
+          </div>
+
+          <div class="item">
+            <div class="item-top">
+              <span class="item-name">Rizoto ze sušených hřibů, parmazán</span>
+              <span class="leader"></span>
+              <span class="item-price">285</span>
+            </div>
+            <p class="item-desc">Hřiby z loňského září louhujeme přes noc a vodu z nich používáme jako základ vývaru. Bez masa.</p>
+            <p class="allerg">Alergeny: 7, 9</p>
+          </div>
+
+          <div class="item">
+            <div class="item-top">
+              <span class="item-name">Smažený kuřecí řízek, bramborový salát</span>
+              <span class="leader"></span>
+              <span class="item-price">265</span>
+            </div>
+            <p class="item-desc">Kuře z Klatovska, trojobal ze strouhanky z našeho chleba. Salát zaděláváme den předem, aby se srovnal.</p>
+            <p class="allerg">Alergeny: 1, 3, 7, 10</p>
+          </div>
+        </div>
+
+        <div class="course">
+          <h3>Dezerty a nápoje</h3>
+
+          <div class="item">
+            <div class="item-top"><span class="item-name">Tvarohový koláč, kompotované meruňky</span><span class="leader"></span><span class="item-price">125</span></div>
+            <p class="allerg">Alergeny: 1, 3, 7</p>
+          </div>
+          <div class="item">
+            <div class="item-top"><span class="item-name">Zmrzlina z kvašené smetany, lipový med</span><span class="leader"></span><span class="item-price">95</span></div>
+            <p class="allerg">Alergeny: 7</p>
+          </div>
+          <div class="item">
+            <div class="item-top"><span class="item-name">Frankovka, Velké Bílovice 2022 — 0,15 l</span><span class="leader"></span><span class="item-price">95</span></div>
+            <p class="allerg">Alergeny: 12</p>
+          </div>
+          <div class="item">
+            <div class="item-top"><span class="item-name">Ryzlink rýnský, Znojmo 2023 — 0,15 l</span><span class="leader"></span><span class="item-price">89</span></div>
+            <p class="allerg">Alergeny: 12</p>
+          </div>
+          <div class="item">
+            <div class="item-top"><span class="item-name">Únětický kvasnicový ležák 12° — 0,5 l</span><span class="leader"></span><span class="item-price">65</span></div>
+            <p class="allerg">Alergeny: 1</p>
+          </div>
+          <div class="item">
+            <div class="item-top"><span class="item-name">Domácí limonáda, bezinka a máta — 0,4 l</span><span class="leader"></span><span class="item-price">79</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lunch">
+      <div>
+        <p class="tag">Polední menu</p>
+        <h3>Po–Pá, 11:00–14:00</h3>
+        <p>Každý den polévka a dvě hlavní jídla, z toho jedno bez masa. Vyvěšujeme ho ráno v devět sem na web. Bez rezervace, ale po půl dvanácté bývá plno.</p>
+      </div>
+      <div>
+        <dl>
+          <dt>Polévka</dt><dd>Kmínová s vejcem a domácím chlebem</dd><dd class="pr">v ceně</dd>
+          <dt>Hlavní 1</dt><dd>Vepřová plec na paprice, houskový knedlík</dd><dd class="pr">189</dd>
+          <dt>Hlavní 2</dt><dd>Čočka na kyselo, sázené vejce, okurka</dd><dd class="pr">175</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="kuchyne">
+  <div class="wrap">
+    <div class="chef">
+      <img src="img/chef.jpg" alt="Šéfkuchař porcuje celou rybu na dřevěném prkně v kuchyni" width="1000" height="1250" loading="lazy">
+      <div class="chef-body">
+        <p class="eyebrow">Kuchyně</p>
+        <h2>Vařím to, co se dá koupit do sta kilometrů</h2>
+        <p>Ne proto, že je to trend. Proto, že když znám člověka, který mi to pěstuje, můžu mu zavolat a zeptat se, co je zrovna dobré. Kachny vozíme z Řepína, hovězí z Vysočiny, ryby z Nových Mlýnů. Když něco dojde, škrtneme to z karty a nedovážíme náhradu odjinud.</p>
+        <p>Nemám rád jídlo, které se tváří jinak, než jaké je. Líčka jsou líčka — osm hodin v troubě, vedle celer a nic dalšího. Na talíři u nás není nic, co by se nedalo sníst.</p>
+        <div class="provenance">
+          <span>Kachna — Vojta Kratochvíl, Řepín</span>
+          <span>Hovězí — farma Dolní Radslavice</span>
+          <span>Ryby — Nové Mlýny</span>
+          <span>Chléb — pečeme v domě</span>
+        </div>
+        <p class="sign"><b>Adam Vrbata</b>šéfkuchař a spolumajitel, v Kořeni od otevření v roce 2019</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec room">
+  <div class="wrap">
+    <div class="room-grid">
+      <img src="img/room.jpg" alt="Interiér bistra v podvečerním světle, bar s lahvemi a závěsná svítidla" width="1400" height="938" loading="lazy">
+      <div>
+        <p class="quote">„Kachna, kterou si pamatujete ještě druhý den. A účet, ze kterého vás nebolí hlava.“</p>
+        <p class="quote-src"><span class="demo-tag">Ukázkový citát</span><br>Na skutečném webu sem patří konkrétní recenze s jménem autora a odkazem na zdroj — jeden dobrý citát váží víc než pět log v řadě.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="navsteva">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Návštěva</p>
+      <h2>Kde nás najdete</h2>
+    </div>
+    <div class="visit-grid">
+      <div>
+        <div class="info-block">
+          <h4>Otevírací doba</h4>
+          <dl class="hours" id="hours">
+            <div style="display:contents" data-day="1"><dt>Po</dt><dd>zavřeno</dd></div>
+            <div style="display:contents" data-day="2"><dt>Út</dt><dd>11:00 – 22:00</dd></div>
+            <div style="display:contents" data-day="3"><dt>St</dt><dd>11:00 – 22:00</dd></div>
+            <div style="display:contents" data-day="4"><dt>Čt</dt><dd>11:00 – 22:00</dd></div>
+            <div style="display:contents" data-day="5"><dt>Pá</dt><dd>11:00 – 23:00</dd></div>
+            <div style="display:contents" data-day="6"><dt>So</dt><dd>12:00 – 23:00</dd></div>
+            <div style="display:contents" data-day="0"><dt>Ne</dt><dd>12:00 – 21:00</dd></div>
+          </dl>
+          <p style="font-size:.88rem;color:var(--dim);margin-top:-1.4rem">Kuchyně přijímá objednávky do hodiny před zavírací dobou.</p>
+        </div>
+
+        <div class="info-block">
+          <h4>Adresa</h4>
+          <p>Kořenná 8, 120 00 Praha 2 – Vinohrady</p>
+        </div>
+
+        <div class="info-block">
+          <h4>Jak k nám</h4>
+          <p>Tramvaj 11, zastávka Vinohradská tržnice — dvě minuty pěšky. Metro A, Jiřího z Poděbrad — šest minut. Parkování v modré zóně, o víkendu bývá v okolních ulicích volno.</p>
+        </div>
+
+        <div class="info-block">
+          <h4>Přístupnost a sál</h4>
+          <p>Bezbariérový vstup přímo z ulice, toaleta v přízemí. V pátek a v sobotu večer je v sále hlučno — na klidnější večeři doporučujeme všední dny. Dress code nemáme.</p>
+        </div>
+
+        <div class="info-block">
+          <h4>Radši zavolat?</h4>
+          <a class="phone-line" href="tel:+420212345678">+420 212 345 678</a>
+          <p style="margin-top:.4rem">Bereme telefon celou otevírací dobu. Mimo ni nám napište, ozveme se ráno.</p>
+        </div>
+      </div>
+      <img src="img/visit.jpg" alt="Prostřené stoly u dřevěné stěny v sále bistra" width="1400" height="1750" loading="lazy">
+    </div>
+  </div>
+</section>
+
+<section class="sec resv" id="rezervace">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow on-cream">Rezervace</p>
+      <h2>Zamluvit stůl</h2>
+      <p class="lede on-cream">Stačí šest údajů. Žádný účet, žádné heslo, žádný souhlas s newsletterem.</p>
+    </div>
+    <div class="resv-grid">
+      <form id="resvForm" novalidate>
+        <div class="field full">
+          <label for="r-name">Jméno a příjmení</label>
+          <input type="text" id="r-name" name="name" autocomplete="name" required>
+        </div>
+        <div class="field half">
+          <label for="r-people">Počet osob</label>
+          <select id="r-people" name="people" required>
+            <option value="1">1 osoba</option>
+            <option value="2" selected>2 osoby</option>
+            <option value="3">3 osoby</option>
+            <option value="4">4 osoby</option>
+            <option value="5">5 osob</option>
+            <option value="6">6 osob</option>
+            <option value="7">7 osob</option>
+            <option value="8">8 osob</option>
+            <option value="9">9 a více — zavolejte nám</option>
+          </select>
+        </div>
+        <div class="field half">
+          <label for="r-date">Datum</label>
+          <input type="date" id="r-date" name="date" required>
+        </div>
+        <div class="field half">
+          <label for="r-time">Čas</label>
+          <select id="r-time" name="time" required>
+            <option>11:30</option><option>12:00</option><option>12:30</option><option>13:00</option>
+            <option>17:00</option><option>17:30</option><option selected>18:00</option><option>18:30</option>
+            <option>19:00</option><option>19:30</option><option>20:00</option><option>20:30</option>
+          </select>
+        </div>
+        <div class="field half">
+          <label for="r-email">E-mail</label>
+          <input type="email" id="r-email" name="email" autocomplete="email" required>
+        </div>
+        <div class="field full">
+          <label for="r-note">Alergie a poznámka</label>
+          <textarea id="r-note" name="note" placeholder="Např.: jeden host bez lepku, prosíme stůl dál od baru."></textarea>
+        </div>
+        <p class="err" id="resvErr" role="alert"></p>
+        <div class="form-actions">
+          <button class="btn dark big" type="submit">Odeslat rezervaci</button>
+          <small>Ukázkový formulář — nic se nikam neodešle.</small>
+        </div>
+      </form>
+
+      <aside class="policies">
+        <h3>Než přijdete</h3>
+        <ul>
+          <li>Stůl držíme 15 minut po domluveném čase, pak ho uvolňujeme dalším hostům.</li>
+          <li>Rezervaci zrušte prosím do 12:00 v den návštěvy — telefonem nebo odpovědí na potvrzovací e-mail.</li>
+          <li>Skupiny od devíti osob domlouváme jen telefonicky, ať vám můžeme sestavit menu dopředu.</li>
+          <li>Alergie napište do poznámky. Kuchyně na ni reaguje, ale pracujeme v jedné kuchyni s lepkem, ořechy a mořskými plody.</li>
+          <li>U baru máme šest míst, která nerezervujeme. Na ně se dá kdykoliv přijít bez ohlášení.</li>
+        </ul>
+        <p class="call">Nechcete vyplňovat formulář? Zavolejte na <a href="tel:+420212345678">212&nbsp;345&nbsp;678</a>.</p>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<section class="sec pitch" id="nabidka">
+  <div class="wrap">
+    <div class="pitch-grid">
+      <div>
+        <p class="eyebrow">Proč jste dostali tenhle odkaz</p>
+        <h2>Takhle může vypadat web vaší restaurace</h2>
+        <p class="lede">Všechno nad touhle sekcí je ukázka — smyšlený podnik, smyšlené ceny. Ale stránka funguje přesně tak, jak by fungovala ta vaše: menu v telefonu čitelné bez zvětšování, otevírací doba, která se sama pozná podle dne, a rezervace, co přijde rovnou vám do schránky.</p>
+        <p class="lede" style="margin-top:1.2rem">Pokud dnes posíláte hostům PDF s jídelním lístkem nebo profil na sociální síti, tohle je rozdíl, který poznají hned.</p>
+      </div>
+      <div>
+        <ul class="deliver">
+          <li><span class="mark">01</span><span><b>Menu jako stránka, ne PDF.</b> Otevře se na mobilu za vteřinu, dá se hledat, Google si ho přečte. Ceny a položky si měníte sami.</span></li>
+          <li><span class="mark">02</span><span><b>Rezervační formulář.</b> Chodí na váš e-mail, bez měsíčních poplatků třetí straně a bez cizího widgetu, který rozbije vzhled.</span></li>
+          <li><span class="mark">03</span><span><b>Adresa, doba a telefon na každé obrazovce.</b> Na mobilu lišta dole, ze které se dá rovnou volat.</span></li>
+          <li><span class="mark">04</span><span><b>Data pro Google.</b> Strukturované označení restaurace, menu a otevírací doby, aby vás vyhledávač uměl ukázat i s hodnocením.</span></li>
+          <li><span class="mark">05</span><span><b>Fotky, které nesou náladu.</b> Pomůžu vybrat z vašich, nebo domluvit fotografa. Stock fotky jídla poznají hosté na první pohled.</span></li>
+          <li><span class="mark">06</span><span><b>Hotovo do dvou týdnů</b> od chvíle, kdy dodáte menu a fotky. Doména, hosting a HTTPS zařídím.</span></li>
+        </ul>
+
+        <div class="contact">
+          <p class="fillnote">↓ Než web rozešlete, doplňte tady své kontakty</p>
+          <dl>
+            <dt>Web dělá</dt><dd><span class="fill">Vaše Jméno</span></dd>
+            <dt>E-mail</dt><dd><span class="fill">vas@email.cz</span></dd>
+            <dt>Telefon</dt><dd><span class="fill">+420 000 000 000</span></dd>
+          </dl>
+          <p style="margin-top:1.3rem;font-size:.92rem;color:var(--dim)">Napište mi dvě věty o svém podniku a pošlu vám návrh a cenu. Nezávazně.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot">
+    <span class="brand">Bistro <em style="font-style:normal;color:var(--flame)">Kořen</em></span>
+    <span>Kořenná 8, Praha 2 – Vinohrady</span>
+    <a href="tel:+420212345678">+420 212 345 678</a>
+    <span class="end">Ukázková stránka. Bistro Kořen je smyšlený podnik.</span>
+  </div>
+</footer>
+
+<div class="mobar">
+  <a class="btn ghost" href="tel:+420212345678">Zavolat</a>
+  <a class="btn" href="#rezervace">Rezervovat</a>
+</div>
+
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"Restaurant",
+  "name":"Bistro Kořen",
+  "servesCuisine":["Česká","Sezónní"],
+  "priceRange":"$$",
+  "telephone":"+420212345678",
+  "acceptsReservations":"True",
+  "address":{"@type":"PostalAddress","streetAddress":"Kořenná 8","addressLocality":"Praha 2 – Vinohrady","postalCode":"12000","addressCountry":"CZ"},
+  "hasMenu":{"@type":"Menu","hasMenuSection":[
+    {"@type":"MenuSection","name":"Na začátek","hasMenuItem":[
+      {"@type":"MenuItem","name":"Hovězí tatarák, žloutek, topinky","offers":{"@type":"Offer","price":"285","priceCurrency":"CZK"}},
+      {"@type":"MenuItem","name":"Uzený pstruh, křen, kyselá smetana","offers":{"@type":"Offer","price":"195","priceCurrency":"CZK"}}]},
+    {"@type":"MenuSection","name":"Hlavní chody","hasMenuItem":[
+      {"@type":"MenuItem","name":"Hovězí líčka na frankovce, celerové pyré","offers":{"@type":"Offer","price":"395","priceCurrency":"CZK"}},
+      {"@type":"MenuItem","name":"Konfitovaná kachní stehna, červené zelí, knedlík","offers":{"@type":"Offer","price":"345","priceCurrency":"CZK"}}]}]},
+  "openingHoursSpecification":[
+    {"@type":"OpeningHoursSpecification","dayOfWeek":["Tuesday","Wednesday","Thursday"],"opens":"11:00","closes":"22:00"},
+    {"@type":"OpeningHoursSpecification","dayOfWeek":"Friday","opens":"11:00","closes":"23:00"},
+    {"@type":"OpeningHoursSpecification","dayOfWeek":"Saturday","opens":"12:00","closes":"23:00"},
+    {"@type":"OpeningHoursSpecification","dayOfWeek":"Sunday","opens":"12:00","closes":"21:00"}],
+  "aggregateRating":{"@type":"AggregateRating","ratingValue":"4.8","reviewCount":"312"}
+}
+</script>
+
+<script>
+(function(){
+  "use strict";
+
+  /* --- sticky nav state --- */
+  var nav = document.getElementById("nav");
+  var onScroll = function(){ nav.classList.toggle("solid", window.scrollY > 24); };
+  onScroll();
+  window.addEventListener("scroll", onScroll, {passive:true});
+
+  /* --- mobile nav --- */
+  var toggle = document.getElementById("navtoggle");
+  var links = document.getElementById("navlinks");
+  toggle.addEventListener("click", function(){
+    var open = links.classList.toggle("open");
+    toggle.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+  links.addEventListener("click", function(e){
+    if (e.target.tagName === "A") {
+      links.classList.remove("open");
+      toggle.setAttribute("aria-expanded","false");
+    }
+  });
+
+  /* --- otevírací doba: dnešní stav --- */
+  var HOURS = {
+    0:[12*60, 21*60], 1:null, 2:[11*60, 22*60], 3:[11*60, 22*60],
+    4:[11*60, 22*60], 5:[11*60, 23*60], 6:[12*60, 23*60]
+  };
+  var NAMES = ["v neděli","v pondělí","v úterý","ve středu","ve čtvrtek","v pátek","v sobotu"];
+  function hhmm(m){ return String(Math.floor(m/60)).padStart(2,"0") + ":" + String(m%60).padStart(2,"0"); }
+
+  var now = new Date();
+  var day = now.getDay();
+  var mins = now.getHours()*60 + now.getMinutes();
+  var today = HOURS[day];
+  var dot = document.getElementById("statusDot");
+  var text = document.getElementById("statusText");
+
+  if (today && mins >= today[0] && mins < today[1]) {
+    text.textContent = "Dnes otevřeno do " + hhmm(today[1]);
+  } else {
+    dot.classList.add("shut");
+    var d = day, steps = 0, next = null;
+    while (steps < 7) { d = (d+1) % 7; steps++; if (HOURS[d]) { next = d; break; } }
+    if (today && mins < today[0]) {
+      text.textContent = "Dnes otevíráme v " + hhmm(today[0]);
+    } else if (next !== null) {
+      text.textContent = "Zavřeno · otevíráme " + NAMES[next] + " v " + hhmm(HOURS[next][0]);
+    } else {
+      text.textContent = "Zavřeno";
+    }
+  }
+
+  var row = document.querySelector('#hours [data-day="' + day + '"]');
+  if (row) { row.classList.add("today"); }
+
+  /* --- rezervační formulář --- */
+  var form = document.getElementById("resvForm");
+  var err = document.getElementById("resvErr");
+  var dateInput = document.getElementById("r-date");
+
+  var t = new Date();
+  var iso = function(dt){
+    return dt.getFullYear() + "-" + String(dt.getMonth()+1).padStart(2,"0") + "-" + String(dt.getDate()).padStart(2,"0");
+  };
+  dateInput.min = iso(t);
+  var tomorrow = new Date(t.getTime() + 86400000);
+  dateInput.value = iso(tomorrow);
+
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    err.textContent = "";
+
+    var name = document.getElementById("r-name");
+    var email = document.getElementById("r-email");
+
+    if (name.value.trim().length < 2) {
+      err.textContent = "Doplňte prosím jméno, ať víme, na koho stůl napsat.";
+      name.focus();
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.value.trim())) {
+      err.textContent = "E-mail nevypadá správně — na tuhle adresu posíláme potvrzení.";
+      email.focus();
+      return;
+    }
+    if (!dateInput.value || dateInput.value < iso(new Date())) {
+      err.textContent = "Vyberte prosím dnešní nebo pozdější datum.";
+      dateInput.focus();
+      return;
+    }
+    var chosen = new Date(dateInput.value + "T12:00:00");
+    if (!HOURS[chosen.getDay()]) {
+      err.textContent = "V pondělí máme zavřeno. Vyberte prosím jiný den.";
+      dateInput.focus();
+      return;
+    }
+
+    var people = document.getElementById("r-people");
+    var time = document.getElementById("r-time");
+    var summary = people.options[people.selectedIndex].text.toLowerCase() +
+                  ", " + chosen.toLocaleDateString("cs-CZ", {day:"numeric", month:"long"}) +
+                  " v " + time.value;
+
+    var box = document.createElement("div");
+    box.className = "resv-ok";
+    box.setAttribute("role","status");
+    box.innerHTML = "<b>Ukázka — rezervace se nikam neodeslala.</b>" +
+      "Na ostrém webu by teď odešlo: <strong>" + summary + "</strong> na e-mail restaurace a hostovi by do minuty přišlo potvrzení. " +
+      "Formulář ale skutečně kontroluje jméno, e-mail i to, že v pondělí máme zavřeno — vyzkoušejte si to.";
+
+    var old = form.querySelector(".resv-ok");
+    if (old) { old.remove(); }
+    form.appendChild(box);
+    box.scrollIntoView({block:"nearest", behavior:"smooth"});
+  });
+})();
+</script>
+
+</body>
+</html>
