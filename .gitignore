@@ -1,2 +1,6 @@
+# lokalni jednosouborova verze (fotky zabalene v HTML)
 bistro-koren-jeden-soubor.html
-.vercel/
+
+# Vercel
+.vercel
+.env*
